@@ -7,7 +7,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
-import android.widget.Toast
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.events.RCTEventEmitter
@@ -169,6 +168,7 @@ class MapboxNavigationView(private val context: ThemedReactContext): FrameLayout
   /**
    * Stores and updates the state of whether the voice instructions should be played as they come or muted.
    */
+
   private var isVoiceInstructionsMuted = false
     set(value) {
       field = value
@@ -381,11 +381,7 @@ class MapboxNavigationView(private val context: ThemedReactContext): FrameLayout
     val maneuvers = maneuverApi.getManeuvers(routeProgress)
     maneuvers.fold(
       { error ->
-        Toast.makeText(
-          context,
-          error.errorMessage,
-          Toast.LENGTH_SHORT
-        ).show()
+        Log.w("Maneuvers error:", error.throwable)
       },
       {
         val maneuverViewOptions = ManeuverViewOptions.Builder()
@@ -761,5 +757,13 @@ class MapboxNavigationView(private val context: ThemedReactContext): FrameLayout
 
   fun setShowCancelButton(show: Boolean) {
     binding.stop.visibility = if (show) View.VISIBLE else View.INVISIBLE
+  }
+
+  fun getOrigin(): Point? {
+    return origin
+  }
+  
+  fun getDestination(): Point? {
+    return destination
   }
 }
