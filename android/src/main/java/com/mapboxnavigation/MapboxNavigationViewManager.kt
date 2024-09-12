@@ -56,13 +56,6 @@ class MapboxNavigationViewManager(private var reactContext: ReactApplicationCont
     maybeInitialize(view)
   }
 
-  @ReactProp(name = "distanceUnit")
-  override fun setDirectionUnit(view: MapboxNavigationView?, value: String?) {
-    if (value != null)  {
-      view?.setDirectionUnit(value)
-    }
-  }
-
   @ReactProp(name = "waypoints")
   override fun setWaypoints(view: MapboxNavigationView?, value: ReadableArray?) {
     if (value == null) {
