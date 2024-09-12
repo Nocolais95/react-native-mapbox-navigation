@@ -11,6 +11,8 @@ import com.mapbox.navigation.base.internal.utils.WaypointFactory
 
 @ReactModule(name = MapboxNavigationViewManager.NAME)
 class MapboxNavigationViewManager(private var reactContext: ReactApplicationContext): MapboxNavigationViewManagerSpec<MapboxNavigationView>() {
+  private var isInitialized = false
+  
   override fun getName(): String {
     return NAME
   }
@@ -22,6 +24,7 @@ class MapboxNavigationViewManager(private var reactContext: ReactApplicationCont
   override fun onDropViewInstance(view: MapboxNavigationView) {
     view.onDropViewInstance()
     super.onDropViewInstance(view)
+    isInitialized = false
   }
 
   override fun getExportedCustomDirectEventTypeConstants(): MutableMap<String, Map<String, String>> {
@@ -41,6 +44,7 @@ class MapboxNavigationViewManager(private var reactContext: ReactApplicationCont
       return
     }
     view?.setStartOrigin(Point.fromLngLat(value.getDouble(0), value.getDouble(1)))
+    maybeInitialize(view)
   }
 
   @ReactProp(name = "destination")
@@ -50,6 +54,7 @@ class MapboxNavigationViewManager(private var reactContext: ReactApplicationCont
       return
     }
     view?.setDestination(Point.fromLngLat(value.getDouble(0), value.getDouble(1)))
+    maybeInitialize(view)
   }
 
   @ReactProp(name = "waypoints")
@@ -69,14 +74,15 @@ class MapboxNavigationViewManager(private var reactContext: ReactApplicationCont
       }
     }
     view?.setWaypoints(waypoints)
+    maybeInitialize(view)
   }
 
   @ReactProp(name = "language")
   override fun setLocal(view: MapboxNavigationView?, language: String?) {
     if (language !== null) {
       view?.setLocal(language)
+      maybeInitialize(view)
     }
-    view?.onCreate()
   }
 
   @ReactProp(name = "showCancelButton")
@@ -87,6 +93,13 @@ class MapboxNavigationViewManager(private var reactContext: ReactApplicationCont
   @ReactProp(name = "mute")
   override fun setMute(view: MapboxNavigationView?, value: Boolean) {
     view?.setMute(value)
+  }
+
+  private fun maybeInitialize(view: MapboxNavigationView?) {
+    if (!isInitialized && view?.getOrigin() != null && view?.getDestination() != null) {
+      view?.onCreate()
+      isInitialized = true
+    }
   }
 
   companion object {
