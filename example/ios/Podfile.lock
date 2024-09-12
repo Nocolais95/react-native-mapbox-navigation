@@ -7,27 +7,27 @@ PODS:
   - hermes-engine (0.74.3):
     - hermes-engine/Pre-built (= 0.74.3)
   - hermes-engine/Pre-built (0.74.3)
-  - MapboxCommon (23.9.2)
-  - MapboxCoreMaps (10.17.0):
-    - MapboxCommon (~> 23.9)
-  - MapboxCoreNavigation (2.18.2):
-    - MapboxDirections (~> 2.12.0)
-    - MapboxNavigationNative (~> 204.0.1)
-  - MapboxDirections (2.12.0):
+  - MapboxCommon (23.10.1)
+  - MapboxCoreMaps (10.18.0):
+    - MapboxCommon (~> 23.10)
+  - MapboxCoreNavigation (2.18.4):
+    - MapboxDirections (~> 2.12)
+    - MapboxNavigationNative (< 205.0.0, >= 204.0.1)
+  - MapboxDirections (2.14.0):
     - Polyline (~> 5.0)
-    - Turf (~> 2.7.0)
-  - MapboxMaps (10.17.0):
-    - MapboxCommon (= 23.9.2)
-    - MapboxCoreMaps (= 10.17.0)
+    - Turf (~> 2.8.0)
+  - MapboxMaps (10.18.2):
+    - MapboxCommon (= 23.10.1)
+    - MapboxCoreMaps (= 10.18.0)
     - MapboxMobileEvents (= 1.0.10)
-    - Turf (= 2.7.0)
+    - Turf (= 2.8.0)
   - MapboxMobileEvents (1.0.10)
-  - MapboxNavigation (2.18.2):
-    - MapboxCoreNavigation (= 2.18.2)
-    - MapboxMaps (~> 10.17.0)
+  - MapboxNavigation (2.18.4):
+    - MapboxCoreNavigation (= 2.18.4)
+    - MapboxMaps (~> 10.17)
     - MapboxSpeech (~> 2.0)
     - Solar-dev (~> 3.0)
-  - MapboxNavigationNative (204.0.1):
+  - MapboxNavigationNative (204.1.0):
     - MapboxCommon (~> 23.9)
   - MapboxSpeech (2.1.1)
   - Polyline (5.1.0)
@@ -959,7 +959,7 @@ PODS:
   - React-Mapbuffer (0.74.3):
     - glog
     - React-debug
-  - react-native-mapbox-navigation (0.3.0):
+  - react-native-mapbox-navigation (0.4.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1212,7 +1212,7 @@ PODS:
     - React-utils (= 0.74.3)
   - SocketRocket (0.7.0)
   - Solar-dev (3.0.1)
-  - Turf (2.7.0)
+  - Turf (2.8.0)
   - Yoga (0.0.0)
 
 DEPENDENCIES:
@@ -1410,14 +1410,14 @@ SPEC CHECKSUMS:
   fmt: 4c2741a687cc09f0634a2e2c72a838b99f1ff120
   glog: fdfdfe5479092de0c4bdbebedd9056951f092c4f
   hermes-engine: 1f547997900dd0752dc0cc0ae6dd16173c49e09b
-  MapboxCommon: 768660d6fca8193529ecf82eb6f5f9ae7a5acdf9
-  MapboxCoreMaps: be412ff97b16aa7820922c818115a9a0d8211caa
-  MapboxCoreNavigation: ae88fed601889eb833537b9c25a2adae6523e639
-  MapboxDirections: 4676f626df320732dcf74612223e568d39588320
-  MapboxMaps: 87ef0003e6db46e45e7a16939f29ae87e38e7ce2
+  MapboxCommon: 0ff437e44988da6856e280d00ffb266564ed0487
+  MapboxCoreMaps: f1bd9405f5b9d3e343f2fe4138775299699a22fb
+  MapboxCoreNavigation: a4fa72bdb987dc9ab55615878299bf571f83a2b1
+  MapboxDirections: 3d468327d3e2ac52ae1be2176004976580cf6fd9
+  MapboxMaps: e76b14f52c54c40b76ddecd04f40448e6f35a864
   MapboxMobileEvents: de50b3a4de180dd129c326e09cd12c8adaaa46d6
-  MapboxNavigation: b420c01711bb29d69b24964436da36c481e1504e
-  MapboxNavigationNative: cf3640d04da6e67b701f76b1c502954286efee06
+  MapboxNavigation: b80fc4d8317c38fe01aa2aff2d365d6d9f7ad62a
+  MapboxNavigationNative: 2667fa3783d7e5196def8d7cf9e6fdafd87b7ef9
   MapboxSpeech: cd25ef99c3a3d2e0da72620ff558276ea5991a77
   Polyline: 2a1f29f87f8d9b7de868940f4f76deb8c678a5b1
   RCT-Folly: 02617c592a293bd6d418e0a88ff4ee1f88329b47
@@ -1444,7 +1444,7 @@ SPEC CHECKSUMS:
   React-jsitracing: 6b3c8c98313642140530f93c46f5a6ca4530b446
   React-logger: fa92ba4d3a5d39ac450f59be2a3cec7b099f0304
   React-Mapbuffer: 9f68550e7c6839d01411ac8896aea5c868eff63a
-  react-native-mapbox-navigation: 1aad9f22b2813813986af32801c2b2126c4192e0
+  react-native-mapbox-navigation: 25d186ddb7611e9e1dbf8e36a2e2fb96f14c313f
   React-nativeconfig: fa5de9d8f4dbd5917358f8ad3ad1e08762f01dcb
   React-NativeModulesApple: 585d1b78e0597de364d259cb56007052d0bda5e5
   React-perflogger: 7bb9ba49435ff66b666e7966ee10082508a203e8
@@ -1470,9 +1470,9 @@ SPEC CHECKSUMS:
   ReactCommon: f00e436b3925a7ae44dfa294b43ef360fbd8ccc4
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   Solar-dev: 4612dc9878b9fed2667d23b327f1d4e54e16e8d0
-  Turf: 13d1a92d969ca0311bbc26e8356cca178ce95da2
+  Turf: aa2ede4298009639d10db36aba1a7ebaad072a5e
   Yoga: 04f1db30bb810187397fa4c37dd1868a27af229c
 
-PODFILE CHECKSUM: 67b023e4d474be28543a2e79a1f0fddcd5078a6b
+PODFILE CHECKSUM: c576ad85f7005813d302972cd741b4e27d1db498
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.14.3

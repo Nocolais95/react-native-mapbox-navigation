@@ -97,11 +97,10 @@ class MapboxNavigation extends React.Component<
       );
     }
     const {
-      language,
       startOrigin,
-      waypoints,
       destination,
       style,
+      distanceUnit = 'imperial',
       onLocationChange,
       onRouteProgressChange,
       onError,
@@ -112,10 +111,10 @@ class MapboxNavigation extends React.Component<
       <View style={style}>
         <MapboxNavigationView
           style={styles.mapbox}
+          distanceUnit={distanceUnit}
           startOrigin={[startOrigin.longitude, startOrigin.latitude]}
-          waypoints={waypoints}
+          destinationTitle={destination.title}
           destination={[destination.longitude, destination.latitude]}
-          language={language}
           onLocationChange={(event) => onLocationChange?.(event.nativeEvent)}
           onRouteProgressChange={(event) =>
             onRouteProgressChange?.(event.nativeEvent)

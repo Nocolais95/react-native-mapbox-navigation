@@ -23,10 +23,12 @@ RCT_CUSTOM_VIEW_PROPERTY(waypoints, NSArray, NSObject)
     [self performSelector:@selector(setWaypoints:coordinates:) withObject:view withObject:coordinates];
 }
 RCT_EXPORT_VIEW_PROPERTY(destination, NSArray)
+RCT_EXPORT_VIEW_PROPERTY(destinationTitle, NSString)
 RCT_EXPORT_VIEW_PROPERTY(shouldSimulateRoute, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(showsEndOfRouteFeedback, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(showCancelButton, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(language, NSString)
+RCT_EXPORT_VIEW_PROPERTY(distanceUnit, NSString)
 RCT_EXPORT_VIEW_PROPERTY(mute, BOOL)
 
 @end

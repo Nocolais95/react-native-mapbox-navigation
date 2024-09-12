@@ -10,12 +10,15 @@ import android.widget.FrameLayout
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.events.RCTEventEmitter
+import com.mapbox.api.directions.v5.DirectionsCriteria
 import com.mapbox.api.directions.v5.models.RouteOptions
 import com.mapbox.bindgen.Expected
 import com.mapbox.common.location.Location
 import com.mapbox.geojson.Point
+import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.EdgeInsets
 import com.mapbox.maps.ImageHolder
+import com.mapbox.maps.ScreenCoordinate
 import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.animation.camera
 import com.mapbox.maps.plugin.locationcomponent.location
@@ -23,6 +26,7 @@ import com.mapbox.navigation.base.TimeFormat
 import com.mapbox.navigation.base.extensions.applyDefaultNavigationOptions
 import com.mapbox.navigation.base.extensions.applyLanguageAndVoiceUnitOptions
 import com.mapbox.navigation.base.formatter.DistanceFormatterOptions
+import com.mapbox.navigation.base.formatter.UnitType
 import com.mapbox.navigation.base.internal.route.Waypoint
 import com.mapbox.navigation.base.options.NavigationOptions
 import com.mapbox.navigation.base.route.NavigationRoute
@@ -88,6 +92,7 @@ class MapboxNavigationView(private val context: ThemedReactContext): FrameLayout
   private var origin: Point? = null
   private var destination: Point? = null
   private var waypoints: List<Point> = listOf()
+  private var distanceUnit: String = DirectionsCriteria.IMPERIAL
   private var locale = Locale.getDefault()
 
   /**
@@ -114,7 +119,7 @@ class MapboxNavigationView(private val context: ThemedReactContext): FrameLayout
    * Mapbox Navigation entry point. There should only be one instance of this object for the app.
    * You can use [MapboxNavigationProvider] to help create and obtain that instance.
    */
-  private lateinit var mapboxNavigation: MapboxNavigation
+  private var mapboxNavigation: MapboxNavigation? = null
 
   /*
    * Below are generated camera padding values to ensure that the route fits well on screen while
@@ -367,7 +372,9 @@ class MapboxNavigationView(private val context: ThemedReactContext): FrameLayout
    */
   private val routeProgressObserver = RouteProgressObserver { routeProgress ->
     // update the camera position to account for the progressed fragment of the route
-    viewportDataSource.onRouteProgressChanged(routeProgress)
+    if (routeProgress.fractionTraveled.toDouble() != 0.0) {
+      viewportDataSource.onRouteProgressChanged(routeProgress)
+    }
     viewportDataSource.evaluate()
 
     // draw the upcoming maneuver arrow on the map
@@ -465,13 +472,11 @@ class MapboxNavigationView(private val context: ThemedReactContext): FrameLayout
     }
   }
 
-  @SuppressLint("MissingPermission")
-  fun onCreate() {
-    if (origin == null || destination == null) {
-      sendErrorToReact("origin and destination are required")
-      return
-    }
+  init {
+    onCreate()
+  }
 
+  private fun onCreate() {
     // initialize Mapbox Navigation
     mapboxNavigation = if (MapboxNavigationProvider.isCreated()) {
       MapboxNavigationProvider.retrieve()
@@ -481,8 +486,17 @@ class MapboxNavigationView(private val context: ThemedReactContext): FrameLayout
           .build()
       )
     }
+  }
 
-    initNavigation()
+  @SuppressLint("MissingPermission")
+  private fun initNavigation() {
+    if (origin == null || destination == null) {
+      sendErrorToReact("origin and destination are required")
+      return
+    }
+
+    // Start Navigation
+    startNavigation()
 
     // set the animations lifecycle listener to ensure the NavigationCamera stops
     // automatically following the user location when the map is interacted with
@@ -513,7 +527,10 @@ class MapboxNavigationView(private val context: ThemedReactContext): FrameLayout
     }
 
     // make sure to use the same DistanceFormatterOptions across different features
-    val distanceFormatterOptions = DistanceFormatterOptions.Builder(context).build()
+    val unitType = if (distanceUnit == "imperial") UnitType.IMPERIAL else UnitType.METRIC
+    val distanceFormatterOptions = DistanceFormatterOptions.Builder(context)
+      .unitType(unitType)
+      .build()
 
     // initialize maneuver api that feeds the data to the top banner maneuver view
     maneuverApi = MapboxManeuverApi(
@@ -591,10 +608,10 @@ class MapboxNavigationView(private val context: ThemedReactContext): FrameLayout
     routeLineView.cancel()
     speechApi.cancel()
     voiceInstructionsPlayer?.shutdown()
-    mapboxNavigation.stopTripSession()
+    mapboxNavigation?.stopTripSession()
   }
 
-  private fun initNavigation() {
+  private fun startNavigation() {
     // initialize location puck
     binding.mapView.location.apply {
       setLocationProvider(navigationLocationProvider)
@@ -643,16 +660,19 @@ class MapboxNavigationView(private val context: ThemedReactContext): FrameLayout
   }
 
   private fun findRoute(coordinates: List<Point>) {
-    mapboxNavigation.requestRoutes(
+    mapboxNavigation?.requestRoutes(
       RouteOptions.builder()
         .applyDefaultNavigationOptions()
         .applyLanguageAndVoiceUnitOptions(context)
         .coordinatesList(coordinates)
         .language(locale.language)
+        .steps(true)
+        .voiceInstructions(true)
+        .voiceUnits(distanceUnit)
         .build(),
       object : NavigationRouterCallback {
         override fun onCanceled(routeOptions: RouteOptions, @RouterOrigin routerOrigin: String) {
-          // no impl
+          // no implementation
         }
 
         override fun onFailure(reasons: List<RouterFailure>, routeOptions: RouteOptions) {
@@ -673,7 +693,7 @@ class MapboxNavigationView(private val context: ThemedReactContext): FrameLayout
   private fun setRouteAndStartNavigation(routes: List<NavigationRoute>) {
     // set routes, where the first route in the list is the primary route that
     // will be used for active guidance
-    mapboxNavigation.setNavigationRoutes(routes)
+    mapboxNavigation?.setNavigationRoutes(routes)
 
     // show UI elements
     binding.soundButton.visibility = View.VISIBLE
@@ -681,17 +701,17 @@ class MapboxNavigationView(private val context: ThemedReactContext): FrameLayout
     binding.tripProgressCard.visibility = View.VISIBLE
 
     // move the camera to overview when new route is available
-    navigationCamera.requestNavigationCameraToOverview()
-    mapboxNavigation.startTripSession(withForegroundService = true)
+//    navigationCamera.requestNavigationCameraToOverview()
+    mapboxNavigation?.startTripSession(withForegroundService = true)
   }
 
   private fun startRoute() {
     // register event listeners
-    mapboxNavigation.registerRoutesObserver(routesObserver)
-    mapboxNavigation.registerArrivalObserver(arrivalObserver)
-    mapboxNavigation.registerRouteProgressObserver(routeProgressObserver)
-    mapboxNavigation.registerLocationObserver(locationObserver)
-    mapboxNavigation.registerVoiceInstructionsObserver(voiceInstructionsObserver)
+    mapboxNavigation?.registerRoutesObserver(routesObserver)
+    mapboxNavigation?.registerArrivalObserver(arrivalObserver)
+    mapboxNavigation?.registerRouteProgressObserver(routeProgressObserver)
+    mapboxNavigation?.registerLocationObserver(locationObserver)
+    mapboxNavigation?.registerVoiceInstructionsObserver(voiceInstructionsObserver)
 
     // Create a list of coordinates that includes origin, destination
     val coordinatesList = mutableListOf<Point>()
@@ -703,14 +723,14 @@ class MapboxNavigationView(private val context: ThemedReactContext): FrameLayout
 
   override fun onDetachedFromWindow() {
     super.onDetachedFromWindow()
-    mapboxNavigation.unregisterRoutesObserver(routesObserver)
-    mapboxNavigation.unregisterArrivalObserver(arrivalObserver)
-    mapboxNavigation.unregisterLocationObserver(locationObserver)
-    mapboxNavigation.unregisterRouteProgressObserver(routeProgressObserver)
-    mapboxNavigation.unregisterVoiceInstructionsObserver(voiceInstructionsObserver)
+    mapboxNavigation?.unregisterRoutesObserver(routesObserver)
+    mapboxNavigation?.unregisterArrivalObserver(arrivalObserver)
+    mapboxNavigation?.unregisterLocationObserver(locationObserver)
+    mapboxNavigation?.unregisterRouteProgressObserver(routeProgressObserver)
+    mapboxNavigation?.unregisterVoiceInstructionsObserver(voiceInstructionsObserver)
 
     // Clear routs and end
-    mapboxNavigation.setNavigationRoutes(listOf())
+    mapboxNavigation?.setNavigationRoutes(listOf())
 
     // hide UI elements
     binding.soundButton.visibility = View.INVISIBLE
@@ -733,6 +753,13 @@ class MapboxNavigationView(private val context: ThemedReactContext): FrameLayout
 
   fun setStartOrigin(origin: Point?) {
     this.origin = origin
+    if (origin != null) {
+      val initialCameraOptions = CameraOptions.Builder()
+        .zoom(14.0)
+        .center(origin)
+        .build()
+      binding.mapView.mapboxMap.setCamera(initialCameraOptions)
+    }
   }
 
   fun setDestination(destination: Point?) {
@@ -741,6 +768,11 @@ class MapboxNavigationView(private val context: ThemedReactContext): FrameLayout
 
   fun setWaypoints(waypoints: List<Point>) {
     this.waypoints = waypoints
+  }
+
+  fun setDirectionUnit(unit: String) {
+    this.distanceUnit = unit
+    initNavigation()
   }
 
   fun setLocal(language: String) {

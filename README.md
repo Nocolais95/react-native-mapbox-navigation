@@ -6,7 +6,10 @@ Mapbox React Native SDKs enable interactive maps and real-time, traffic-aware tu
 📱&nbsp; Supports iOS, Android<br>
 🌍&nbsp; Various languages<br>
 🎨&nbsp; Customizable<br>
-⛕&nbsp; Multiple Waypoints
+⛕&nbsp; Multiple Waypoints<br>
+🚘&nbsp; iOS CarPlay Support
+
+<a href="https://www.buymeacoffee.com/pawan_kumar" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 
 ## Route View
 
@@ -161,6 +164,8 @@ const styles = StyleSheet.create({
 - `showCancelButton` (boolean): [Android Only] If true, shows a cancel button on the navigation screen. Defaults to `false`.
 
 - `language` (string): The language for the navigation instructions. Defaults to `en`.
+
+- `distanceUnit` ('metric' | 'imperial'): Unit of direction and voice instructions (default is 'imperial')
 
 - `onLocationChange`: Function that is called frequently during route navigation. It receives `latitude`, `longitude`, `heading` and `accuracy` as parameters that represent the current location during navigation.
 

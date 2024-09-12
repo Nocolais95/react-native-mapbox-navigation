@@ -23,7 +23,7 @@ target 'MapboxNavigationExample' do
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
-
+  
   target 'MapboxNavigationExampleTests' do
     inherit! :complete
     # Pods for testing
