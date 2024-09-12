@@ -173,6 +173,7 @@ class MapboxNavigationView(private val context: ThemedReactContext): FrameLayout
   /**
    * Stores and updates the state of whether the voice instructions should be played as they come or muted.
    */
+
   private var isVoiceInstructionsMuted = false
     set(value) {
       field = value
@@ -788,5 +789,13 @@ class MapboxNavigationView(private val context: ThemedReactContext): FrameLayout
 
   fun setShowCancelButton(show: Boolean) {
     binding.stop.visibility = if (show) View.VISIBLE else View.INVISIBLE
+  }
+
+  fun getOrigin(): Point? {
+    return origin
+  }
+  
+  fun getDestination(): Point? {
+    return destination
   }
 }
